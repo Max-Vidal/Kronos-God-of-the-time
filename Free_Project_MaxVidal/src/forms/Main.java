@@ -34,7 +34,7 @@ public class Main {
     private Integer seg;
 
     //GAME
-    private int hp = 20;
+    private int hp = 1000;
 
     public Main() {
         panelMain.setPreferredSize(new Dimension(800, 600));
@@ -106,6 +106,45 @@ public class Main {
         game();
 
         // FALTA EL TIMER PARA QUE LE QUITEN VIDA AL USUARIO
+        new Timer(1, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                labelHP.setText(String.valueOf(hp)+" / 1000");
+            }
+        }).start();
+
+        new Timer(500, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JLabel user = heart;
+
+                int userX = user.getX();
+                int[] userPixels = new int[user.getWidth()];
+
+                for (int i = 0; i < userPixels.length; i++) {
+                    int pixel = userX+i;
+                    userPixels[i] = pixel;
+                }
+
+                JLabel actualAttackZone = attackZone;
+                int[] attackPixels = new int[actualAttackZone.getWidth()];
+                for (int i = 0; i < attackPixels.length; i++) {
+                    int pixel = (actualAttackZone.getX()-box.getX())+i;
+                    attackPixels[i] = pixel;
+                }
+
+                for (int i : attackPixels) {
+                    for (int j : userPixels) {
+                        if (i == j) {
+                            if (actualAttackZone.isVisible()) {
+                                hp--;
+                                break;
+                            }
+                        }
+                    }
+                }
+                System.out.println(hp);
+            }
+        }).start();
+
     }
 
 
@@ -393,7 +432,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Main");
+        JFrame frame = new JFrame("Kronos: God of the time");
         frame.setContentPane(new Main().panelMain);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
