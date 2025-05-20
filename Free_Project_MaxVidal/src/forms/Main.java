@@ -104,7 +104,6 @@ public class Main {
 
         //GAME
         game();
-        // PRUEBA GITHUB
 
         
         // FALTA EL TIMER PARA QUE LE QUITEN VIDA AL USUARIO
