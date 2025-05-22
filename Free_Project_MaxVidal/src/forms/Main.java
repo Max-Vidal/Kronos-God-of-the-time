@@ -37,6 +37,8 @@ public class Main {
 
     //GAME
     private Integer hp = 1000;
+    private Integer puntuacioFinal = 0;
+    private String username;
 
     //TIMERS
     private Timer userHP;
@@ -128,11 +130,27 @@ public class Main {
 
     }
 
+    private void finalJoc(){
+        new Timer(2000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //FI DEL JOC
+                puntuacioFinal = points + (hp*3);
+
+                username = JOptionPane.showInputDialog("Username:");
+                if (username != null) {
+                    JOptionPane.showMessageDialog(null, username+" points: "+puntuacioFinal);
+                }
+
+                ((Timer) e.getSource()).stop();
+            }
+        }).start();
+    }
+
     private void lowBossHP(){
         lowerBossHP = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int remainingBossHP = bossHP.getWidth();
-                bossHP.setSize(remainingBossHP-1, bossHP.getHeight());
+                bossHP.setSize(remainingBossHP-50, bossHP.getHeight());
 
                 if (remainingBossHP <= 0) {
                     userHP.stop();
@@ -142,12 +160,7 @@ public class Main {
                     pointsTimer.stop();
                     ((Timer) e.getSource()).stop();
 
-                    new Timer(2000, new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            //PUNTUACION Y NOMBRE USUARIO
-                            ((Timer) e.getSource()).stop();
-                        }
-                    }).start();
+                    finalJoc();
                 }
             }
         });
