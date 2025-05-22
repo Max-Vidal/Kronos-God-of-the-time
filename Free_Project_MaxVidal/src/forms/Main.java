@@ -22,6 +22,8 @@ public class Main {
 
     //BOSS
     private JLabel boss;
+    private JLayeredPane labelBossHP;
+    private JLabel bossHP;
 
     //ATTACKS
     private JLabel leftAttack;
@@ -34,7 +36,14 @@ public class Main {
     private Integer seg;
 
     //GAME
-    private int hp = 1000;
+    private Integer hp = 1000;
+
+    //TIMERS
+    private Timer userHP;
+    private Timer lowerBossHP;
+    private Timer hitTimer;
+    private Timer gameTimer;
+    private Timer pointsTimer;
 
     public Main() {
         panelMain.setPreferredSize(new Dimension(800, 600));
@@ -102,18 +111,60 @@ public class Main {
         attackZone.setVisible(false);
 
 
+        // BOSS HP LABEL
+        labelBossHP = (JLayeredPane) labelBossHP();
+        panelCenter.add(labelBossHP);
+
+
+        // BOSS HP COLOR LABEL
+        bossHP = (JLabel) bossHP();
+        labelBossHP.add(bossHP,Integer.valueOf(0));
+
         //GAME
         game();
+        hpTimer();
+        hit();
+        lowBossHP();
 
-        
-        // FALTA EL TIMER PARA QUE LE QUITEN VIDA AL USUARIO
-        new Timer(1, new ActionListener() {
+    }
+
+    private void lowBossHP(){
+        lowerBossHP = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int remainingBossHP = bossHP.getWidth();
+                bossHP.setSize(remainingBossHP-1, bossHP.getHeight());
+
+                if (remainingBossHP <= 0) {
+                    userHP.stop();
+                    lowerBossHP.stop();
+                    hitTimer.stop();
+                    gameTimer.stop();
+                    pointsTimer.stop();
+                    ((Timer) e.getSource()).stop();
+
+                    new Timer(2000, new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            //PUNTUACION Y NOMBRE USUARIO
+                            ((Timer) e.getSource()).stop();
+                        }
+                    }).start();
+                }
+            }
+        });
+        lowerBossHP.start();
+    }
+
+    private void hpTimer(){
+        userHP = new Timer(1, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 labelHP.setText(String.valueOf(hp)+" / 1000");
             }
-        }).start();
+        });
+        userHP.start();
+    }
 
-        new Timer(500, new ActionListener() {
+    private void hit(){
+        hitTimer = new Timer(100, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JLabel user = heart;
 
@@ -142,16 +193,14 @@ public class Main {
                         }
                     }
                 }
-                System.out.println(hp);
             }
-        }).start();
-
+        });
+        hitTimer.start();
     }
-
 
     private void game(){
         seg = 0;
-        new Timer(1000, new ActionListener() {
+        gameTimer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 seg++;
 
@@ -176,7 +225,57 @@ public class Main {
                 }
 
             }
-        }).start();
+        });
+        gameTimer.start();
+    }
+
+    private Component bossHP(){
+        bossHP = new JLabel();
+        bossHP.setOpaque(true);
+        bossHP.setBackground(new Color(89,0,153));
+        bossHP.setBounds(
+                0,
+                0,
+                labelBossHP.getWidth(),labelBossHP.getHeight()
+        );
+        bossHP.setVisible(true);
+        bossHP.setLayout(null);
+
+        return bossHP;
+    }
+
+    private Component labelBossHP(){
+        labelBossHP = new JLayeredPane();
+
+        labelBossHP.setOpaque(true);
+        labelBossHP.setBackground(new Color(255,237,208));
+
+        labelBossHP.setSize(boss.getWidth(),15);
+
+        labelBossHP.setBounds(
+                (boss.getX()),
+                (boss.getY()-labelBossHP.getHeight())-5,
+                labelBossHP.getWidth(),labelBossHP.getHeight()
+        );
+
+        labelBossHP.setVisible(true);
+        labelBossHP.setLayout(null);
+
+        //BORDER
+        JLabel border = new JLabel();
+        border.setOpaque(false);
+        border.setBorder(BorderFactory.createLineBorder(Color.BLACK,3));
+        border.setBounds(
+                0,
+                0,
+                labelBossHP.getWidth(),labelBossHP.getHeight()
+        );
+        border.setVisible(true);
+        border.setLayout(null);
+
+        labelBossHP.add(border,Integer.valueOf(1));
+
+        return labelBossHP;
     }
 
     private Component nextAttack(JLabel attackZone){
@@ -312,14 +411,14 @@ public class Main {
 
     private Component pointsLabel() {
         points = 0;
-        Timer timer = new Timer(1000, new ActionListener() {
+        pointsTimer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 points++;
                 pointsLabel.setText(String.valueOf(points)+" Points");
             }
         });
-        timer.start();
+        pointsTimer.start();
 
         pointsLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -343,6 +442,7 @@ public class Main {
     private Component boss(){
         boss = new JLabel();
         boss.setOpaque(false);
+        boss.setSize(400,200);
 
         ImageIcon bossIcon = new ImageIcon("src/assets/boss.png");
         Icon icon = new ImageIcon(
@@ -350,7 +450,7 @@ public class Main {
         );
         boss.setIcon(icon);
 
-        boss.setBounds((box.getX()/2), (box.getY()-box.getHeight())-200, bossIcon.getIconWidth(), bossIcon.getIconHeight());
+        boss.setBounds((box.getX()/2), (box.getY()-box.getHeight())-52, boss.getWidth(), boss.getHeight());
 
         boss.setLayout(null);
         boss.setVisible(true);
@@ -404,7 +504,7 @@ public class Main {
     private Component box(){
         box = new JLabel();
         box.setSize(300,150);
-        box.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        box.setBorder(BorderFactory.createLineBorder(Color.BLACK,4));
 
         box.setLocation(
                 panelCenter.getWidth()/2 - box.getWidth()/2,
