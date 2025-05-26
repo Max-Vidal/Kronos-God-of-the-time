@@ -130,7 +130,20 @@ public class Main {
 
     }
 
-    private void finalJoc(){
+    private void finalJocLose(){
+        new Timer(2000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //YOU LOSE
+
+                JOptionPane.showMessageDialog(null, "YOU LOSE");
+                System.exit(0);
+
+                ((Timer) e.getSource()).stop();
+            }
+        }).start();
+    }
+
+    private void finalJocWin(){
         new Timer(2000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //FI DEL JOC
@@ -138,7 +151,18 @@ public class Main {
 
                 username = JOptionPane.showInputDialog("Username:");
                 if (username != null) {
+
+                    while (Database.comprovarUser(username)) {
+                        JOptionPane.showMessageDialog(null, "Error. Username is already in use");
+                        username = JOptionPane.showInputDialog("Username:");
+                    }
+
                     JOptionPane.showMessageDialog(null, username+" points: "+puntuacioFinal);
+                    Database.insertarUsuari(username);
+                    Database.insertarPartida(username,puntuacioFinal);
+
+                    JOptionPane.showMessageDialog(null, Database.top());
+                    System.exit(0);
                 }
 
                 ((Timer) e.getSource()).stop();
@@ -150,7 +174,7 @@ public class Main {
         lowerBossHP = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int remainingBossHP = bossHP.getWidth();
-                bossHP.setSize(remainingBossHP-50, bossHP.getHeight());
+                bossHP.setSize(remainingBossHP-2, bossHP.getHeight());
 
                 if (remainingBossHP <= 0) {
                     userHP.stop();
@@ -159,8 +183,9 @@ public class Main {
                     gameTimer.stop();
                     pointsTimer.stop();
                     ((Timer) e.getSource()).stop();
+                    box.setFocusable(false);
 
-                    finalJoc();
+                    finalJocWin();
                 }
             }
         });
@@ -170,7 +195,31 @@ public class Main {
     private void hpTimer(){
         userHP = new Timer(1, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+
                 labelHP.setText(String.valueOf(hp)+" / 1000");
+
+                //LOSE
+                if (hp <= 0){
+
+                    labelHP.setText("0 / 1000");
+
+                    userHP.stop();
+                    lowerBossHP.stop();
+                    hitTimer.stop();
+                    gameTimer.stop();
+                    pointsTimer.stop();
+                    ((Timer) e.getSource()).stop();
+                    box.setFocusable(false);
+
+                    ImageIcon heartIcon = new ImageIcon("src/assets/death.png");
+                    Icon icon = new ImageIcon(
+                            heartIcon.getImage().getScaledInstance(30, 25, Image.SCALE_DEFAULT)
+                    );
+
+                    heart.setIcon(icon);
+
+                    finalJocLose();
+                }
             }
         });
         userHP.start();
