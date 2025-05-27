@@ -36,7 +36,7 @@ CREATE TABLE aconseguir_repte (
 -- GRANT SELECT, INSERT ON kronos.* TO adminMax@localhost;
 
 
-insert into usuari(nom) values ('Paco');
+insert into usuari(nom) values ('Marcos');
 insert into usuari(nom) values ('Nil');
 insert into usuari(nom) values ('Iago');
 insert into usuari(nom) values ('Hector');
